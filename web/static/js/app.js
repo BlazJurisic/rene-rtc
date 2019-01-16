@@ -1,6 +1,6 @@
 import "phoenix_html"
 import socket from "./socket"
-import {Presence} from "phoenix"
+import { Presence } from "phoenix"
 import Peer from "simple-peer"
 import getUserMedia from "getusermedia"
 
@@ -10,9 +10,9 @@ let updateStatus = (status) => {
   let myVideo = document.getElementById('status')
   myVideo.textContent = status
 }
-updateStatus("Waiting for another User")
+updateStatus("Waiting for other user")
 let joinChannel = () => {
-  if(!Peer.WEBRTC_SUPPORT) {
+  if (!Peer.WEBRTC_SUPPORT) {
     updateStatus("Sorry your browser is not supported, please use Chrome or Firefox")
     return
   }
@@ -23,7 +23,7 @@ let joinChannel = () => {
     .receive("error", resp => { console.log("Unable to join", resp) })
 
   channel.on(`chat_start`, payload => {
-    if(payload.users.includes(window.user_id)) {
+    if (payload.users.includes(window.user_id)) {
       updateStatus("Another user found, connecting...")
       let otherUser = payload.users.filter((id) => window.user_id != id)[0]
       channel.leave()
@@ -33,21 +33,24 @@ let joinChannel = () => {
         .receive("ok", resp => { console.log("Joined  callChannel successfully", resp) })
         .receive("error", resp => { console.log("Unable to join", resp) })
 
-      getUserMedia({video: true, audio: true}, (err, stream) => {
-        if(err) {
+      getUserMedia({ video: true, audio: true }, (err, stream) => {
+        if (err) {
           updateStatus("There was a problem with your WebCam/Microphone. Please check your settings and try again.")
           joinChannel();
           return
         }
+        console.log(err)
+
 
         let myVideo = document.getElementById('my-video')
         let video = document.getElementById('caller-video')
         let vendorURL = window.URL || window.webkitURL
-        myVideo.src = vendorURL ? vendorURL.createObjectURL(stream) : stream
+        //myVideo.src = vendorURL ? vendorURL.createObjectURL(stream) : stream
+        myVideo.srcObject = stream
         myVideo.muted = true
         myVideo.play()
 
-        var peer = new Peer({ initiator: payload.initiator == window.user_id, trickle: true, stream: stream, config: {iceServers: [{urls:'stun:stun.l.google.com:19302'}, {urls:'stun:stun1.l.google.com:19302'}, {urls:'stun:stun2.l.google.com:19302'}, {urls:'stun:stun3.l.google.com:19302'}, {urls:'stun:stun4.l.google.com:19302'}]}})
+        var peer = new Peer({ initiator: payload.initiator == window.user_id, trickle: true, stream: stream, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:stun2.l.google.com:19302' }, { urls: 'stun:stun3.l.google.com:19302' }, { urls: 'stun:stun4.l.google.com:19302' }] } })
 
         peer.on('error', err => {
           try {
@@ -61,7 +64,7 @@ let joinChannel = () => {
             updateStatus("User lost waiting for another")
             peer.destroy()
             joinChannel()
-          } catch(err) {
+          } catch (err) {
             //Ignore
           }
         })
@@ -80,7 +83,7 @@ let joinChannel = () => {
             video.src = null
             updateStatus("User lost waiting for another")
             joinChannel()
-          } catch(err) {
+          } catch (err) {
             //Ignore
           }
         })
@@ -91,7 +94,8 @@ let joinChannel = () => {
         peer.on('stream', (callerStream) => {
           // got remote video stream, now let's show it in a video tag
           video = document.getElementById('caller-video')
-          video.src = vendorURL ? vendorURL.createObjectURL(callerStream) : callerStream
+          //video.src = vendorURL ? vendorURL.createObjectURL(callerStream) : callerStream
+          video.srcObject = callerStream
           video.play()
           updateStatus("Video Streaming")
         })

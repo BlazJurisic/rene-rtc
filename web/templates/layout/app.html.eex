@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>ElixirConf Roulette</title>
+    <title>Rene prototype</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
 
@@ -16,7 +16,7 @@
     <script>window.user_id = "<%= assigns[:user_id] %>";</script>
     <div class="container">
       <div class="row">
-        <h1> ElixirConf Roulette </h1>
+        <h1> Rene prototype </h1>
       </div>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
@@ -30,7 +30,7 @@
     <footer class="footer">
       <div class="container">
         <div class="row">
-          Made by <a href="http://www.rokkincat.com">RokkinCat</a>
+       
         </div>
       </div>
     </footer>
